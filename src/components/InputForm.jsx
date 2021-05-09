@@ -49,8 +49,8 @@ const InputForm = () => {
 
   useEffect(() => {
     sentences.forEach((i) => {
-      if (occurrences(i, '[MASK]') > 1) {
-        setErrorMessage('Only one [MASK] allowed per sentence.');
+      if (occurrences(i, '__') > 1) {
+        setErrorMessage("Only one '__' allowed per sentence.");
         return;
       }
     });
@@ -67,60 +67,16 @@ const InputForm = () => {
       return valuePassed;
     }
 
-    if (!value.includes('[MASK]')) {
-      setErrorMessage(
-        'Please provide at least one [MASK] for BERT to fill in.'
-      );
+    if (!value.includes('__')) {
+      setErrorMessage("Please provide at least one '__' for BERT to fill in.");
       valuePassed = false;
       return valuePassed;
     }
 
     return valuePassed;
-
-    // Break apart the paragraph into an array of sentences
-
-    // Check that at least one sentence has a [MASK] and that no sentence has >1 [MASK]
-
-    // return true/false based on these checks passing
-
-    //  Check if value is defined
-    /* if (value) {
-      // Run reach individual check
-      if (value.length > 0) {
-        lengthCheck = true;
-      } else {
-        setErrorMessage('Please provide some text.');
-      }
-      if (value.includes('[MASK]')) {
-        maskCheck = true;
-      }
-      const regex = /[^.!?]+[.!?]+["']?|.+$/g;
-
-      const sentencesArray = value
-        .trim()
-        .match(regex)
-        .map((i) => {
-          return i.trim();
-        });
-
-      sentencesArray.forEach((i) => {
-        if (occurrences(i, '[MASK]') > 1) {
-          oneMaskPerSentence = false;
-          return;
-        }
-      }); 
-    }
-
-    // if all checks defined above are true, return true
-    if (lengthCheck && maskCheck && oneMaskPerSentence) {
-      return true;
-    } else {
-      return false;
-    } */
   };
 
   const handleChange = (value) => {
-    console.log('value typed:', value);
     setErrorMessage('');
     setUserText(value);
     if (value) {
@@ -137,7 +93,7 @@ const InputForm = () => {
   const handleSubmit = async () => {
     setLoading(true);
     if (checkSubmittedText(userText)) {
-      console.log('apiKey', apiKey);
+      const swapForMask = userText.replaceAll('__', '[MASK]');
       const getBertResponse = await axios({
         url: apiUrl,
         method: 'post',
@@ -145,11 +101,10 @@ const InputForm = () => {
           Authorization: apiKey,
         },
         data: {
-          inputs: userText,
+          inputs: swapForMask,
         },
       });
 
-      console.log('getBertResponse', getBertResponse);
       if (getBertResponse && getBertResponse.data) {
         setBertResponse(getBertResponse.data[0].sequence);
       }
@@ -167,22 +122,31 @@ const InputForm = () => {
   };
 
   return (
-    <Container mt='5%'>
+    <Container mt='5vh'>
       <FormControl id='email' isInvalid={errorMessage}>
         <FormLabel>
-          <Heading size='md'>Play Mad Libs with BERT...</Heading>
+          <Heading as='h2' size='lg'>
+            Play Mad Libs with BERT
+          </Heading>
         </FormLabel>
+        <FormHelperText mb='10px'>
+          <b>Use a __ (double underscore) for blank spaces.</b>
+          <br />
+          <br /> This mini-app uses a DistilBERT model focused on Masked
+          Language Modeling ('MLM') to predict masked words and learn a
+          bidirectional representation of the sentence. In this case, we're
+          manually placing the masked words as our blank spaces. While not the
+          intended purpose of this model, it's still lot's of fun to play with!
+        </FormHelperText>
         <Textarea
-          placeholder='Write sentences with at least one value for BERT to fill in...'
+          placeholder='Write your Mad Lib here...'
           value={userText}
           onChange={(e) => {
             handleChange(e.target.value);
           }}
         />
-        <FormErrorMessage>{errorMessage}</FormErrorMessage>
-        <FormHelperText mb='10px'>
-          Make sure to leave at least one <b>[MASK]</b> for BERT to fill in.
-        </FormHelperText>
+        <FormErrorMessage pb='12px'>{errorMessage}</FormErrorMessage>
+
         <Button
           isLoading={loading}
           isDisabled={errorMessage}
@@ -191,7 +155,7 @@ const InputForm = () => {
           size='sm'
           onClick={handleSubmit}
         >
-          Submit to BERT
+          Fill in the blanks!
         </Button>
         <Button
           ml='5px'
@@ -203,8 +167,15 @@ const InputForm = () => {
           Reset
         </Button>
       </FormControl>
-      <Divider my='20px' />
-      <Text mt='5px'>{bertResponse}</Text>
+      {bertResponse && (
+        <>
+          <Divider my='20px' />
+          <Heading as='h2' size='md'>
+            BERT's completed Mad Lib:
+          </Heading>
+          <Text mt='15px'>{bertResponse}</Text>
+        </>
+      )}
       <Divider my='20px' />
       <Text fontSize='sm'>
         <span role='img' aria-label='megaphone'>
