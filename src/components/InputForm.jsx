@@ -21,20 +21,20 @@ const apiKey = `Bearer ${process.env.REACT_APP_HF_API_KEY}`;
 
 const sentenceRegex = /[^.!?]+[.!?]+["']?|.+$/g;
 
-const occurrences = (string, subString, allowOverlapping) => {
+const occurrences = (string, subString) => {
   string += '';
   subString += '';
-  if (subString.length <= 0) return string.length + 1;
+  if (subString.length <= 0) return 0;
 
-  var n = 0,
-    pos = 0,
-    step = allowOverlapping ? 1 : subString.length;
+  let n = 0,
+    p = 0,
+    step = subString.length;
 
   while (true) {
-    pos = string.indexOf(subString, pos);
-    if (pos >= 0) {
+    p = string.indexOf(subString, p);
+    if (p >= 0) {
       ++n;
-      pos += step;
+      p += step;
     } else break;
   }
   return n;
@@ -50,7 +50,7 @@ const InputForm = () => {
   useEffect(() => {
     sentences.forEach((i) => {
       if (occurrences(i, '__') > 1) {
-        setErrorMessage("Only one '__' allowed per sentence.");
+        setErrorMessage('Only one __ allowed per sentence.');
         return;
       }
     });
@@ -62,13 +62,13 @@ const InputForm = () => {
 
     // Check if we got any text from the user
     if (!value) {
-      setErrorMessage('Please provide some text.');
+      setErrorMessage("You didn't write anything!");
       valuePassed = false;
       return valuePassed;
     }
 
     if (!value.includes('__')) {
-      setErrorMessage("Please provide at least one '__' for BERT to fill in.");
+      setErrorMessage('Please provide at least one __ for BERT to fill in.');
       valuePassed = false;
       return valuePassed;
     }
@@ -133,10 +133,10 @@ const InputForm = () => {
           <b>Use a __ (double underscore) for blank spaces.</b>
           <br />
           <br /> This mini-app uses a DistilBERT model focused on Masked
-          Language Modeling ('MLM') to predict masked words and learn a
-          bidirectional representation of the sentence. In this case, we're
-          manually placing the masked words as our blank spaces. While not the
-          intended purpose of this model, it's still lot's of fun to play with!
+          Language Modeling ('MLM') to predict masked words in a sentence. In
+          this case, we're manually placing the masked words as blank spaces.
+          While Mad Libs are not the intended purpose of this model, it's still
+          fun to play with!
         </FormHelperText>
         <Textarea
           placeholder='Write your Mad Lib here...'
@@ -199,7 +199,7 @@ const InputForm = () => {
         >
           Hugging Face
         </Link>{' '}
-        team for the BERT model and API.
+        team for the model and API.
       </Text>
     </Container>
   );
