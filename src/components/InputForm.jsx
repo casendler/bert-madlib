@@ -10,6 +10,7 @@ import {
   FormHelperText,
   Textarea,
   Button,
+  Divider,
 } from '@chakra-ui/react';
 
 const apiUrl =
@@ -75,8 +76,14 @@ const InputForm = () => {
           Submit to BERT
         </Button>
       </FormControl>
+      <Divider my='20px' />
       <Heading mt='20px'>Response from BERT</Heading>
-      <Text>{bertResponse}</Text>
+      <Text mt='5px'>{bertResponse}</Text>
+      <Divider my='20px' />
+      <Text>
+        Uses the following model from HF:
+        https://huggingface.co/distilbert-base-uncased
+      </Text>
     </Container>
   );
 };
