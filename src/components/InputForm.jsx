@@ -165,7 +165,7 @@ const InputForm = () => {
           this model, it's still fun to play with!
           <br />
           <br />
-          Try to copying the paragraph above and replacing a few works with __ .
+          Try to copying the paragraph above and replacing a few words with __ .
         </FormHelperText>
         <Textarea
           fontSize='12px'
