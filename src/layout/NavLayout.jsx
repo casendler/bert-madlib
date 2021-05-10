@@ -10,7 +10,6 @@ const NavLayout = () => {
       as='nav'
       px={{ base: '10px', md: '20px', lg: '40px' }}
       py='2'
-      bg='#5DA2D5'
       alignItems='center'
     >
       <Box pr='2'>

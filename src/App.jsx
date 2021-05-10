@@ -5,7 +5,7 @@ import InputForm from './components/InputForm';
 
 function App() {
   return (
-    <Box>
+    <Box bg='#5DA2D5' h='100vh'>
       <NavLayout />
       <InputForm />
     </Box>
